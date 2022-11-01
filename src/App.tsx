@@ -2,9 +2,9 @@ import Box from '@mui/material/Box'
 import * as React from 'react'
 import './App.css'
 import Header from './layouts/Header'
-import {Button, Container, Typography} from "@mui/material";
+import {Button, Container, Tooltip, Zoom} from "@mui/material";
 import {useEffect, useState} from 'react';
-import axios, {AxiosError} from 'axios'
+import axios from 'axios'
 import Card from './components/Card'
 import CardLoader from './components/CardLoader';
 
@@ -24,13 +24,16 @@ const App: React.FC = () => {
     const fetchData = async () => {
         const jokeResponse = await axios.get(BASE_URL + `/${randomId()}`)
         setJoke(jokeResponse.data)
-        setLoading(false) // выключение лоадера при загрузке
-        console.log('click')
+        setTimeout(() => {
+            setLoading(false) // выключение лоадера при загрузке
+        }, 3000)
     }
     useEffect(() => {
-        fetchData()
+        fetchData().finally(()=>{
+            console.log('Fetch data is ready')
+        })
     }, [])
-// TODO: поменять цвет скелетона, убрать всё по компонентам и мб добавить подсказки при наведении
+// TODO: поменять цвет скелетона, убрать всё по компонентам и мб добавить подсказки при наведении, удалить ненужное
     const randomId = () => (
         Math.floor(1 + Math.random() * (12 + 1 - 1))
     )
@@ -43,14 +46,14 @@ const App: React.FC = () => {
                         {
                             isLoading ? <CardLoader/> : <Card joke={joke}/>
                         }
-                        <Button variant='outlined' onClick={() => {
-                            fetchData()
-                        }}>Generate</Button>
+                        <Tooltip title="Generate" arrow TransitionComponent={Zoom}>
+                            <Button variant='outlined' onClick={() => {
+                                fetchData()
+                            }}>Generate</Button>
+                        </Tooltip>
                     </Box>
                 </Container>
             </Box>
-
-
         </>
     )
 }
